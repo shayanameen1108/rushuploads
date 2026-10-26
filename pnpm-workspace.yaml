@@ -1,0 +1,19 @@
+# `vp migrate` writes this so Vite and Vitest resolve to Vite+'s copies.
+# Upgrade with `vp upgrade`, then `vp migrate`.
+catalog:
+  vite: npm:@voidzero-dev/vite-plus-core@1.4.0
+  vite-plus: 1.4.0
+overrides:
+  vite@*: "catalog:"
+peerDependencyRules:
+  allowAny:
+    - vite
+  allowedVersions:
+    vite: "*"
+# Their install scripts only check the platform binary each already ships.
+allowBuilds:
+  esbuild: false
+  workerd: false
+permissions:
+  "@tanstack/react-start":
+    skills: true

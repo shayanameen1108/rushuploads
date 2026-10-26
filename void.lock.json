@@ -1,0 +1,81 @@
+{
+  "version": 1,
+  "source": {
+    "name": "rushuploads",
+    "account_id": "ab816378ce175deba8768e44d4c9478b",
+    "workers_dev": true,
+    "observability": {
+      "enabled": true
+    },
+    "vars": {
+      "APP_NAME": "rushuploads"
+    },
+    "analytics_engine_datasets": [
+      {
+        "binding": "ANALYTICS",
+        "dataset": "rushuploads_events"
+      }
+    ],
+    "ai": {
+      "binding": "AI"
+    },
+    "d1_databases": [
+      {
+        "binding": "DB",
+        "database_name": "rushuploads",
+        "migrations_dir": "./db/migrations"
+      }
+    ],
+    "r2_buckets": [
+      {
+        "binding": "R2",
+        "bucket_name": "rushuploads"
+      }
+    ],
+    "send_email": [
+      {
+        "name": "SEND_EMAIL"
+      }
+    ]
+  },
+  "resolved": {
+    "name": "rushuploads",
+    "account_id": "ab816378ce175deba8768e44d4c9478b",
+    "workers_dev": true,
+    "observability": {
+      "enabled": true
+    },
+    "vars": {
+      "APP_NAME": "rushuploads"
+    },
+    "analytics_engine_datasets": [
+      {
+        "binding": "ANALYTICS",
+        "dataset": "rushuploads_events"
+      }
+    ],
+    "ai": {
+      "binding": "AI"
+    },
+    "d1_databases": [
+      {
+        "binding": "DB",
+        "database_name": "rushuploads",
+        "migrations_dir": "./db/migrations",
+        "database_id": "6bad79b5-7868-487c-9ad6-62e297c7e4c5"
+      }
+    ],
+    "send_email": [
+      {
+        "name": "SEND_EMAIL"
+      }
+    ],
+    "r2_buckets": [
+      {
+        "binding": "R2",
+        "bucket_name": "rushuploads"
+      }
+    ]
+  },
+  "text": "{\n  \"name\": \"rushuploads\",\n  \"account_id\": \"ab816378ce175deba8768e44d4c9478b\",\n  \"workers_dev\": true,\n  \"observability\": {\n    \"enabled\": true\n  },\n  \"vars\": {\n    \"APP_NAME\": \"rushuploads\"\n  },\n  \"analytics_engine_datasets\": [\n    {\n      \"binding\": \"ANALYTICS\",\n      \"dataset\": \"rushuploads_events\"\n    }\n  ],\n  \"ai\": {\n    \"binding\": \"AI\"\n  },\n  \"d1_databases\": [\n    {\n      \"binding\": \"DB\",\n      \"database_name\": \"rushuploads\",\n      \"migrations_dir\": \"./db/migrations\",\n      \"database_id\": \"6bad79b5-7868-487c-9ad6-62e297c7e4c5\"\n    }\n  ],\n  \"send_email\": [\n    {\n      \"name\": \"SEND_EMAIL\"\n    }\n  ],\n  \"r2_buckets\": [\n    {\n      \"binding\": \"R2\",\n      \"bucket_name\": \"rushuploads\"\n    }\n  ]\n}\n"
+}
