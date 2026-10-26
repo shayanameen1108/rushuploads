@@ -1,87 +1,68 @@
 # rushuploads
 
-TanStack Start on Cloudflare Workers, with Tailwind CSS v4 and shadcn/ui (Base UI).
+TanStack Start on Cloudflare Workers, with Tailwind CSS v4 and shadcn/ui (Base UI). Deploys with Void; Vite+ owns development, build, formatting, linting, typechecking, and unit tests.
 
 ## Prerequisites
 
-- [mise](https://mise.jdx.dev) — pins Node LTS and nub for this repo
-- [nub](https://nubjs.com) — package manager, script runner, and `nubx`
-
-```sh
-mise install
-```
+- Node 24 (`.node-version`) — installed by `setup-vp` in CI, or any version manager locally
+- `pnpm` 12 — via the `packageManager` field / Corepack
+- `vp` (Vite+) — see https://viteplus.dev
 
 ## Setup
 
 ```sh
-nub install
+pnpm install
 ```
 
-`postinstall` runs `wrangler types` and writes `worker-configuration.d.ts`. Re-run it after changing `wrangler.jsonc`:
-
-```sh
-nub run cf-typegen
-```
+`postinstall` runs `void prepare`, which generates `.void/` types and the gitignored `.void-wrangler.jsonc` (re-materialized by `scripts/ensure-void-wrangler.mjs` for local D1 and Vitest).
 
 ## Scripts
 
 ```sh
-nub run dev        # Vite + Workers runtime on http://localhost:3000
-nub run build      # production client + worker
-nub run preview    # preview the production build locally
-nub run deploy     # build and wrangler deploy
-nub run typecheck
-nub run lint
-nub run fmt
-nub run fmt:check
+vp dev             # Vite + Workers runtime on http://localhost:3000
+vp build           # production client + worker
+vp preview         # preview the production build locally
+vp check           # format + lint + typecheck (what CI runs first)
+vp test run        # unit tests
+pnpm run db:migrate:local   # apply D1 migrations to the local DB
+pnpm run deploy    # void deploy to Cloudflare
 ```
 
 ## Cloudflare
 
-Bindings live in `wrangler.jsonc` and are available in server code via `import { env } from "cloudflare:workers"`.
+Bindings live in `void.config.ts` (`cloudflare:`), typed env in `env.ts`, Worker vars in `void.config.ts` `vars:` and secrets via `void secret put`.
 
 | Binding      | Resource                          |
 | ------------ | --------------------------------- |
-| `DB`         | D1 (`rushuploads`)                    |
-| `R2`         | R2 bucket (`rushuploads`)             |
+| `DB`         | D1 (`rushuploads`)                |
+| `R2`         | R2 bucket (`rushuploads`)         |
 | `AI`         | Workers AI                        |
-| `QUEUE`      | Queue producer (`rushuploads`)        |
+| `QUEUE`      | Queue producer/consumer           |
 | `ASSETS`     | Workers Assets (Vite injects dir) |
 | `SEND_EMAIL` | Email Routing send binding        |
 | `ANALYTICS`  | Analytics Engine dataset          |
-| `APP_NAME`   | env var                           |
+| `APP_NAME`   | Worker var                        |
 
-Inbound email, queue consumption, and cron are stubbed in `src/server.ts`.
+Cron lives in `crons/system.ts` (hourly placeholder). The queue consumer and inbound-email handler from the original scaffold were stubs; add the real handlers when the product needs them.
 
-Custom domain: uncomment `routes` in `wrangler.jsonc` and replace the hostname.
+D1 has no `database_id` yet — the first deploy provisions it, then record the id in `void.config.ts`.
 
 ```sh
-nubx wrangler login
-nubx wrangler d1 migrations create DB <name>
-nubx wrangler d1 migrations apply DB --local
-nubx wrangler deploy
+pnpm exec wrangler d1 migrations create DB <name> -c .void-wrangler.jsonc
+pnpm run db:migrate:local
+pnpm run deploy
 ```
-
-Workers AI has no local simulation. `vite.config.ts` sets `remoteBindings: false` so `nub run dev` works offline. After `nubx wrangler login`, set `remoteBindings: true` (and `remote: true` on the `AI` binding) for live inference.
-
-Email Routing destination addresses and Analytics Engine queries are configured in the Cloudflare dashboard.
 
 ## UI
 
-shadcn/ui is initialized as **base-nova** (Base UI, not Radix). Paths in `components.json` match this Start app (`src/styles.css`, `@/components`).
+shadcn/ui is initialized as **base-nova** (Base UI, not Radix). Paths in `components.json` match this Start app (`src/styles.css`, `@/components`). Use the locally installed CLI:
 
 ```sh
-nubx -y shadcn@latest add card
+pnpm exec shadcn add card
 ```
 
-If the CLI tries to install dependencies with another package manager, add them here instead:
+Add TanStack Query, Form, and Table when a route needs them:
 
 ```sh
-nub add <package>
-```
-
-TanStack Query, Form, and Table are not wired yet — add them when a route needs them:
-
-```sh
-nub add @tanstack/react-query @tanstack/react-form @tanstack/react-table
+pnpm add @tanstack/react-query @tanstack/react-form @tanstack/react-table
 ```

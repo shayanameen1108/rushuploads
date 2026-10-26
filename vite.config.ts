@@ -1,26 +1,37 @@
-import { defineConfig } from "vite";
-import { cloudflare } from "@cloudflare/vite-plugin";
+import tailwindcss from "@tailwindcss/vite";
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 import viteReact from "@vitejs/plugin-react";
-import tailwindcss from "@tailwindcss/vite";
+import { voidPlugin } from "void";
+import { defineConfig, lazyPlugins } from "vite-plus";
 
 export default defineConfig({
-  server: {
-    port: 3000,
+  staged: {
+    "*": "vp check --fix",
   },
-  resolve: {
-    tsconfigPaths: true,
+  fmt: {
+    ignorePatterns: [".agents/**", "**/routeTree.gen.ts", "void.lock.json"],
   },
-  plugins: [
-    tailwindcss(),
-    cloudflare({
-      viteEnvironment: { name: "ssr" },
-      // Workers AI has no local simulation. Keep this false so `nub run dev`
-      // works without Cloudflare auth. Set true after `nubx wrangler login`
-      // when you want live remote bindings (AI, etc.).
-      remoteBindings: false,
-    }),
-    tanstackStart(),
-    viteReact(),
-  ],
+  lint: {
+    plugins: ["typescript", "react", "unicorn", "oxc", "import", "vitest", "jsx-a11y"],
+    // A correctness finding fails the check; a warning would not.
+    categories: {
+      correctness: "error",
+    },
+    ignorePatterns: [".agents/**", "**/routeTree.gen.ts"],
+    options: {
+      typeAware: true,
+      typeCheck: true,
+    },
+  },
+  run: {
+    tasks: {
+      "check:tokens": "node scripts/check-tokens.mjs",
+    },
+  },
+  resolve: { tsconfigPaths: true },
+  server: { port: 3000 },
+  preview: { port: 4173 },
+  // Lazy, so `vp check`, `vp lint`, and `vp fmt` read this file without
+  // starting the plugins. voidPlugin must come before the framework plugin.
+  plugins: lazyPlugins(() => [voidPlugin(), tailwindcss(), tanstackStart(), viteReact()]),
 });
